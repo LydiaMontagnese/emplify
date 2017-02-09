@@ -1,3 +1,4 @@
+require('dotenv').config()
 var express = require('express')
 var multer = require('multer')
 var mongo = require('mongodb').MongoClient
@@ -17,6 +18,7 @@ var venmo_oauth = "https://api.venmo.com/v1/oauth"
 app.use(express.static('public'))
 
 app.post('/api/login', function(req, res) {
+    //use passport module?
     //query username and password then compare
     //success: return user info
     //fail: return error
@@ -53,7 +55,10 @@ app.post('/api/venmo_oauth/', function(req, res) {
     params += '&scope=make_payments%20access_profile'
     params += '&response_type=code'
     var url = venmo_oauth + params
-    // request(url, function(err, data, body) {})
+    request(url, function(err, data, body) {
+        if (err) throw err
+        //success: venmo passes code through /api/venmo route
+    })
 })
 
 app.get('/api/venmo', function(req, res) {
@@ -61,13 +66,20 @@ app.get('/api/venmo', function(req, res) {
     if (req.query.code) {
         var authorization_code = req.query.code
 
-        var params = '/access_tokens?'
-        params += 'client_id=' + client_id
-        params += '&client_secret=' + client_secret
-        params += '&code=' + authorization_code
+        var params = {
+            client_id: client_id,
+            client_secret: client_secret,
+            code: authorization_code
+        }
 
-        var url = venmo_oauth + params
-        //request.post() //request user info then send to client on success
+        var url = venmo_oauth + '/access_token'
+        request.post(url, params, function(err, res, data){
+            if (err) throw err
+            res.send(data) // data contains user info in JSON format
+        })
+    }
+    else if (req.query.error) {
+        res.send(req.query.error) //user has chosen not to authorize app to access venmo account info
     }
     else {
         res.send({
