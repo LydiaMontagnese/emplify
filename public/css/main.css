@@ -1,0 +1,15 @@
+.navbar-default {
+    background-color: #ff9933;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+}
+
+body {
+    background-color: #F8F8F8;
+}
+
+#logo {
+    height: 25px;
+}
