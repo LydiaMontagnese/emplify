@@ -10,6 +10,79 @@ body {
     background-color: #F8F8F8;
 }
 
+#main {
+    margin: auto;
+    width: 90%;
+}
+
 #logo {
     height: 25px;
+}
+
+.chart {
+    float: right;
+    width: 50%;
+}
+
+.btn-warning {
+    color: white;
+    background-color: #ff9933;
+    border-color: #ff9933;
+}
+
+.user-profile {
+    padding: 25px;
+    background-color: white;
+    margin: 25px;
+}
+
+.user-profile-name {
+    color: #3cf;
+    font-size: 20px;
+}
+
+.gray-text {
+    color: gray;
+}
+
+.about-text {
+    font-size: 16px;
+}
+
+.give-button {
+    float: right;
+    height: 50px;
+    border-radius: 0px;
+}
+
+.progress {
+    height: 50px;
+    background-color: #A1A1A1;
+    border-radius: 0px;
+}
+
+.progress-bar {
+    padding: 15px;
+    font-size: 30px;
+}
+
+.progress-label {
+    font-size: 20px;
+}
+
+.left {
+    float: left;
+}
+
+.middle {
+    text-align: center;
+}
+
+.right {
+    float: right;
+}
+
+.profile-image {
+    padding-right: 10px;
+    width: 100px;
 }
