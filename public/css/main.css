@@ -1,8 +1,42 @@
-.navbar-default {
+.navbar-default,
+.modal-header {
     background-color: #ff9933;
+    color: white;
 }
 
-.navbar-default .navbar-brand {
+.navbar-brand {
+    padding-top:12px;
+}
+
+.modal-content {
+    background-color: #F8F8F8;
+    border-radius: 0px;
+}
+
+.modal-message {
+    color: red;
+    font-size: 10px;
+}
+
+.modal-font {
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1.75;
+}
+
+.givdo-btn {
+    height: 50px;
+    border-radius: 0px;
+}
+
+.givdo-btn-submit {
+    padding:0px;
+    padding-left:10px;
+    padding-right:10px;
+}
+
+.span-font,
+.navbar-default .navbar-nav>li>a {
     color: white;
 }
 
@@ -85,4 +119,21 @@ body {
 .profile-image {
     padding-right: 10px;
     width: 100px;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.form-input {
+    height: 50px;
+    -webkit-border-radius: 0px;
+    -moz-border-radius: 0px;
+    border-radius: 0px;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 50px;
+    padding: 4px 10px;
+    margin: 15px 0;
+    margin-right: 15px;
 }
