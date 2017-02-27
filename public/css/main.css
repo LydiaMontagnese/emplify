@@ -13,17 +13,16 @@
     border-radius: 0px;
 }
 
-.modal-message {
-    color: red;
-    font-size: 10px;
-}
-
 .modal-font {
     font-size: 24px;
     font-weight: 400;
     line-height: 1.75;
 }
 
+.modal-message {
+    color: red;
+    font-size: 20px;
+}
 .givdo-btn {
     height: 50px;
     border-radius: 0px;

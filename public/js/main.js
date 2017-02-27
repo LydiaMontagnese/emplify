@@ -1,7 +1,5 @@
 $(document).ready(
     function() {
-        $('#main').append(getLoginModal())
-        $('#main').append(getSignUpModal())
         renderNotLoggedIn()
     }
 )
@@ -11,6 +9,8 @@ function renderNotLoggedIn() {
         <li><a class="clickable" data-toggle="modal" data-target="#signupModal">Sign Up</a></li>\
         <li><a class="clickable" data-toggle="modal" data-target="#loginModal">Login</a></li>';
     $('#navbar-right').html(links)
+    $('#main').append(getLoginModal())
+    $('#main').append(getSignUpModal())
 }
 
 function renderLoggedIn() {
