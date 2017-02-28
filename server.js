@@ -10,11 +10,17 @@ var app = express()
 var request = require('request')
 var bcrypt = require('bcrypt')
 var session = require('express-session')
-var bodyParser = require("body-parser") 
+var bodyParser = require("body-parser")
 
 var db_url = process.env.MONGODB_URI
 var client_id = process.env.CLIENT_ID
 var client_secret = process.env.CLIENT_SECRET
+
+app.use(session({
+    secret: process.env.SECRET,
+    resave: true,
+    saveUninitialized: true
+}))
 
 const saltRounds = 10
 
@@ -26,35 +32,131 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json())
 
-app.post('/api/login', function(req, res) {
-    if (req.body.username && req.body.password) {
-        mongo.connect(db_url, function(err, db) {
+function findUser(username, found) {
+    mongo.connect(db_url,
+        (err, db) => {
             if (err) throw err
-            else {
-                var users = db.collection('users')
-                res.status(200).json({msg: 'success'})
+
+            var users = db.collection('users')
+            var query = {
+                username: username
             }
+
+            users.findOne(query,
+                (err, user) => {
+                    if (err) {
+                        found(false)
+                        throw err
+                    }
+                    if (user)
+                        found(true, user)
+                    else
+                        found(false)
+                }
+            )
             db.close();
         })
+}
+
+function insertUserInfo(userinfo, inserted) {
+    mongo.connect(db_url,
+        (err, db) => {
+            if (err) throw err
+
+            var users = db.collection('users')
+
+            bcrypt.hash(userinfo.password, saltRounds)
+                .then((hash) => {
+                    var hashed_userinfo = {
+                        username: userinfo.username,
+                        hash: hash
+                    }
+                    users.insert(hashed_userinfo, (err, data) => {
+                        if (err) {
+                            inserted(false)
+                            throw err
+                        }
+                        inserted(true)
+                    })
+                })
+
+            .then(() => {
+                db.close()
+            })
+
+        })
+}
+
+app.post('/api/login', (req, res) => {
+    if (req.body.username && req.body.password) {
+        findUser(req.body.username,
+            (found, user) => {
+                if (found) {
+                    bcrypt.compare(req.body.password, user.hash).then(function(isUser) {
+                        if (isUser) {
+                            req.session.username = req.body.username
+                            res.status(200).json({msg: 'loggin success'})
+                        }
+                        else
+                            res.status(500).json({
+                                error: 'Invalid username or password.'
+                            })
+                    })
+                }
+                else {
+                    res.status(500).json({
+                        msg: 'user does not exist'
+                    })
+                }
+            })
     }
     else
-        res.status(500)
+        res.status(500).json({
+            error: 'no username and/or password'
+        })
 })
 
-app.post('/api/signup', function(req, res) {
-    res.status(200).json({msg: 'success'})
-    //success: insert username and hashed password, log user in (return user info)
-    //fail: send error message
+app.post('/api/signup', (req, res) => {
+
+    if (req.body.username && req.body.password) {
+        findUser(req.body.username,
+            (found) => {
+                if (!found) {
+                    insertUserInfo(req.body,
+                        (inserted) => {
+                            if (inserted)
+                                res.status(200).json({
+                                    msg: 'success'
+                                })
+                            else
+                                res.status(500).json({
+                                    error: 'unknown error'
+                                })
+                        }
+                    )
+                }
+                else {
+                    res.status(500).json({
+                        error: 'user exists'
+                    })
+                }
+            })
+    }
+    else {
+        res.status(500).json({
+            error: 'no username and/or password'
+        })
+    }
 })
 
-app.post('/api/imgupload', upload.single('file'), function(req, res) {
+app.post('/api/imgupload', upload.single('file'), (req, res) => {
 
     if (type == 'image') {
         var type = req.file.mimetype.split('/')[0]
         var ext = req.file.mimetype.split('/')[1]
 
         var newPath = req.file.path + "." + ext
-        fs.rename(req.file.path, newPath, function() {})
+        fs.rename(req.file.path, newPath, () => {})
 
         // if url exists (user has uploaded image), delete existing image before inserting new url
         // update url
@@ -68,18 +170,18 @@ app.post('/api/imgupload', upload.single('file'), function(req, res) {
 
 })
 
-app.post('/api/venmo_oauth/', function(req, res) {
+app.post('/api/venmo_oauth/', (req, res) => {
     var params = '/authorize?client_id=' + client_id
     params += '&scope=make_payments%20access_profile'
     params += '&response_type=code'
     var url = venmo_oauth + params
-    request(url, function(err, data, body) {
+    request(url, (err, data, body) => {
         if (err) throw err
             //success: venmo passes code through /api/venmo route
     })
 })
 
-app.get('/api/venmo', function(req, res) {
+app.get('/api/venmo', (req, res) => {
 
     if (req.query.code) {
         var authorization_code = req.query.code
@@ -91,7 +193,7 @@ app.get('/api/venmo', function(req, res) {
         }
 
         var url = venmo_oauth + '/access_token'
-        request.post(url, params, function(err, res, data) {
+        request.post(url, params, (err, res, data) => {
             if (err) throw err
             res.send(data) // data contains user info in JSON format
         })

@@ -13,13 +13,14 @@ function submitSignupForm() {
                 type: 'POST',
                 data: data
             })
-            .done(function(data) {
-                console.log('done')
+            .fail((data) => {
+                console.log(JSON.stringify(data))
+            })
+            .done((data) => {
+                console.log(JSON.stringify(data))
             });
     }
 }
-
-
 
 function submitLoginForm() {
     if (validateLogin()) {
@@ -37,7 +38,10 @@ function submitLoginForm() {
                 data: data
             })
             .done(function(data) {
-                console.log('done')
+                console.log(JSON.stringify(data))
+            })
+            .fail((data) => {
+                console.log(JSON.stringify(data))
             });
     }
 }
@@ -64,6 +68,8 @@ function validateSignup() {
     var user_name = $('#signup_username').val();
     var pwd1 = $('#new_pwd1').val();
     var pwd2 = $('#new_pwd2').val();
+    
+    msg.html('');
 
     if (!user_name)
         msg.html('Enter username.')
@@ -77,8 +83,8 @@ function validateSignup() {
     else if (pwd1 != pwd2)
         msg.html('Passwords do not match.')
 
-    else if (pwd1.length < 8)
-        msg.html('Password is too short.')
+    // else if (pwd1.length < 8)
+    //     msg.html('Password is too short.')
 
     else
         return true;
