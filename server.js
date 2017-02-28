@@ -8,23 +8,41 @@ var upload = multer({
 })
 var app = express()
 var request = require('request')
+var bcrypt = require('bcrypt')
+var session = require('express-session')
+var bodyParser = require("body-parser") 
 
 var db_url = process.env.MONGODB_URI
 var client_id = process.env.CLIENT_ID
 var client_secret = process.env.CLIENT_SECRET
 
+const saltRounds = 10
+
 var venmo_oauth = "https://api.venmo.com/v1/oauth"
 
 app.use(express.static('public'))
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(bodyParser.json())
 
 app.post('/api/login', function(req, res) {
-    //use passport module?
-    //query username and password then compare
-    //success: return user info
-    //fail: return error
+    if (req.body.username && req.body.password) {
+        mongo.connect(db_url, function(err, db) {
+            if (err) throw err
+            else {
+                var users = db.collection('users')
+                res.status(200).json({msg: 'success'})
+            }
+            db.close();
+        })
+    }
+    else
+        res.status(500)
 })
 
 app.post('/api/signup', function(req, res) {
+    res.status(200).json({msg: 'success'})
     //success: insert username and hashed password, log user in (return user info)
     //fail: send error message
 })
@@ -57,7 +75,7 @@ app.post('/api/venmo_oauth/', function(req, res) {
     var url = venmo_oauth + params
     request(url, function(err, data, body) {
         if (err) throw err
-        //success: venmo passes code through /api/venmo route
+            //success: venmo passes code through /api/venmo route
     })
 })
 
@@ -73,7 +91,7 @@ app.get('/api/venmo', function(req, res) {
         }
 
         var url = venmo_oauth + '/access_token'
-        request.post(url, params, function(err, res, data){
+        request.post(url, params, function(err, res, data) {
             if (err) throw err
             res.send(data) // data contains user info in JSON format
         })

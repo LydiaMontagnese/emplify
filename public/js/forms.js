@@ -1,12 +1,44 @@
 function submitSignupForm() {
     if (validateSignup()) {
-        console.log('valid log in')
+        var user_name = $('#signup_username').val();
+        var pwd = $('#new_pwd1').val();
+        
+        var data = {
+            username: user_name,
+            password: pwd
+        }
+
+        $.ajax({
+                url: "/api/signup",
+                type: 'POST',
+                data: data
+            })
+            .done(function(data) {
+                console.log('done')
+            });
     }
 }
 
+
+
 function submitLoginForm() {
     if (validateLogin()) {
-        console.log('valid sign up')
+
+        var user_name = $('#login_username').val();
+        var pwd = $('#pwd').val();
+        var data = {
+            username: user_name,
+            password: pwd
+        }
+
+        $.ajax({
+                url: "/api/login",
+                type: 'POST',
+                data: data
+            })
+            .done(function(data) {
+                console.log('done')
+            });
     }
 }
 
@@ -14,16 +46,16 @@ function validateLogin() {
     var msg = $('#login_modal_message');
     var user_name = $('#login_username').val();
     var pwd = $('#pwd').val();
-    
+
     msg.html('');
-    
+
     if (!user_name)
         msg.html('Enter username.');
-    else if (!pwd) 
+    else if (!pwd)
         msg.html('Enter password.');
-    else 
+    else
         return true;
-        
+
     return false;
 }
 
@@ -32,25 +64,25 @@ function validateSignup() {
     var user_name = $('#signup_username').val();
     var pwd1 = $('#new_pwd1').val();
     var pwd2 = $('#new_pwd2').val();
-    
+
     if (!user_name)
         msg.html('Enter username.')
 
     else if (!pwd1)
         msg.html('Enter a new password.')
-        
+
     else if (!pwd2)
         msg.html('Re-enter new password.')
-        
+
     else if (pwd1 != pwd2)
         msg.html('Passwords do not match.')
-        
-    else if (pwd1.length < 8) 
+
+    else if (pwd1.length < 8)
         msg.html('Password is too short.')
-        
+
     else
         return true;
-        
+
     return false;
 }
 
